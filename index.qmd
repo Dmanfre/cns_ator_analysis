@@ -1,0 +1,116 @@
+---
+title: "Does ATOR actually lead to wins?"
+author: "Dylan Manfre"
+date: '2023-11-10'
+format: 
+  html:
+    code-fold: true
+---
+
+Early notes: Data comes from Sports Reference
+
+
+```{r, output=FALSE}
+library(tidyverse)
+library(ggrepel)
+library(janitor)
+```
+
+```{r}
+
+logs18_24 <- read.csv("https://thescoop.org/sports-data-files/wbblogs1824.csv")
+#62,584 records ovver 2018-present
+```
+
+establishing lists
+```{r}
+power_5 <- c("ACC", "Big 12", "Big Ten", "Pac-12", "SEC")
+```
+
+
+ -------- data cleaning -------------
+
+# 56 duplicates of the team and date but different stats. Many of these games have reocrds and others don't
+# We need to get rid of the ones where and assists and turnovers are NA because we cant ID an ator for them. 
+```{r}
+logs18_24 %>%
+  get_dupes(Date, TeamFull)
+```
+
+# Now we are working with 61,267 records
+```{r}
+#Getting rid of records where an ator cannot be generated
+logs18_24 <- logs18_24 %>%
+  filter(!is.na(TeamAssists) & !is.na(TeamTurnovers) & !is.na(OpponentAssists) & !is.na(OpponentTurnovers))
+```
+
+mutating certain columns that I may need for the analysis. team_ator, opp_ator and point differnece.
+```{r}
+logs18_24 <- logs18_24 %>%
+  mutate(
+    winloss = case_when(
+      grepl("W", W_L) ~ 1,
+      grepl("L", W_L) ~ 0),
+    team_ator = (TeamAssists) / (TeamTurnovers),
+    opp_ator = (OpponentAssists) / (OpponentTurnovers),
+    pts_diff = TeamScore - OpponentScore)
+```
+
+establishing ator only. These columns will be necessary for my analysis.
+```{r}
+logs18_24 %>%
+  select(Season, Date, TeamFull, Conference, Opponent, TeamScore, OpponentScore, winloss, TeamAssists, TeamTurnovers, OpponentAssists, OpponentTurnovers, team_ator, opp_ator, pts_diff)
+```
+
+
+
+
+
+
+
+
+
+data cleaning
+```{r}
+logs22_23 <- logs22_23 %>%
+  rename(
+    team_ator = ast_tov_ratio,
+    opp_ator = opp_ast_tov_ratio,
+    win_loss = win) %>%
+  mutate(
+    winner = ifelse(opp_pts > pts, away_team_name, home_team_name),
+    loser = ifelse(pts > opp_pts, away_team_name, home_team_name),
+    winning_conference = ifelse(opp_pts > pts, away_team_conference, home_team_conference),
+    losing_conference = ifelse(pts > opp_pts, away_team_conference, home_team_conference),
+    winning_ator = ifelse(winner == home_team_name, team_ator, opp_ator),
+    losing_ator = ifelse(loser == away_team_name, opp_ator, team_ator),
+    difference = pts - opp_pts,
+    season = "2022-2023")
+
+```
+
+
+```{r}
+#picking columns I want
+ator_only <- logs22_23 %>%
+  select(gamedate_east, home_team_name, home_team_conference, pts, away_team_name, away_team_conference, opp_pts, winner, loser, winning_conference, losing_conference, ast, tov, opp_ast, opp_tov, team_ator, opp_ator, difference, winning_ator, losing_ator)
+
+```
+Establishing a teams record for the 2022-23 seaosn. 
+```{r}
+win_counts <- ator_only %>%
+  group_by(team = winner) %>%
+  summarise(wins = n()) %>%
+  arrange(desc(wins)
+```
+
+
+
+
+
+
+
+
+
+
+
