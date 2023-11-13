@@ -8,6 +8,7 @@ format:
 ---
 
 Early notes: Data comes from Sports Reference
+- the data accounts for around 98% of games frpm 18-24 seasons.
 
 
 ```{r, output=FALSE}
@@ -16,14 +17,14 @@ library(ggrepel)
 library(janitor)
 ```
 
-```{r}
+```{r, output=FALSE}
 
 logs18_24 <- read.csv("https://thescoop.org/sports-data-files/wbblogs1824.csv")
 #62,584 records ovver 2018-present
 ```
 
 establishing lists
-```{r}
+```{r, output=FALSE}
 power_5 <- c("ACC", "Big 12", "Big Ten", "Pac-12", "SEC")
 ```
 
@@ -32,20 +33,34 @@ power_5 <- c("ACC", "Big 12", "Big Ten", "Pac-12", "SEC")
 
 # 56 duplicates of the team and date but different stats. Many of these games have reocrds and others don't
 # We need to get rid of the ones where and assists and turnovers are NA because we cant ID an ator for them. 
-```{r}
-logs18_24 %>%
-  get_dupes(Date, TeamFull)
-```
-
+#After this, I saw 8 games were duplicates. Some of these just have the wrong datee and I can manually fix that since its so few. Then I think I would need to join the dupes dataframe back to logs_18_24 so that the duplicate dates dont mess up the overall data. 
 # Now we are working with 61,267 records
-```{r}
+```{r, output=FALSE}
 #Getting rid of records where an ator cannot be generated
 logs18_24 <- logs18_24 %>%
   filter(!is.na(TeamAssists) & !is.na(TeamTurnovers) & !is.na(OpponentAssists) & !is.na(OpponentTurnovers))
 ```
 
+```{r, output=FALSE}
+dupes <- logs18_24 %>%
+  get_dupes(Date, TeamFull)
+view(dupes)
+
+# changing the dates in the eight dupes
+logs18_24$Date <- ifelse(logs18_24$Date == "2019-11-24" & logs18_24$TeamFull == "Oregon Ducks" & logs18_24$Opponent == "Oklahoma State", "2019-11-28",
+            ifelse(logs18_24$Date == "2018-11-24" & logs18_24$TeamFull == "American Eagles" & logs18_24$Opponent == "Hawaii", "2019-11-23",
+                ifelse(logs18_24$Date == "2018-11-24" & logs18_24$TeamFull == "Hawaii Rainbow Warriors" & logs18_24$Opponent == "American", "2018-11-23",
+                    ifelse(logs18_24$Date == "2023-01-25" & logs18_24$TeamFull == "Chicago State Cougars" & logs18_24$Opponent == "St. Francis (IL)", "2023-01-24", logs18_24$Date))))
+
+#checking the new dupes
+logs18_24 %>%
+  get_dupes(Date, TeamFull)
+view(dupes)
+
+```
+
 mutating certain columns that I may need for the analysis. team_ator, opp_ator and point differnece.
-```{r}
+```{r, output=FALSE}
 logs18_24 <- logs18_24 %>%
   mutate(
     winloss = case_when(
@@ -54,58 +69,69 @@ logs18_24 <- logs18_24 %>%
     team_ator = (TeamAssists) / (TeamTurnovers),
     opp_ator = (OpponentAssists) / (OpponentTurnovers),
     pts_diff = TeamScore - OpponentScore)
+
+
+logs18_24$Conference <- sub(" WBB", "", logs18_24$Conference)
+
 ```
 
-establishing ator only. These columns will be necessary for my analysis.
+establishing ator only. These columns will be necessary for my analysis. From here on, the main df will be ator_only.
+```{r, output=FALSE}
+ator_only <- logs18_24 %>%
+  select(Season, Date, TeamFull, Conference, Opponent, TeamScore, OpponentScore, winloss, pts_diff, TeamAssists, TeamTurnovers, OpponentAssists, OpponentTurnovers, team_ator, opp_ator)
+```
+
+----- exploratory data section -------
+
+# Here I want to establish a data frame with season, TeamFull, winloss, team_ator and opp_ator.
+# This will show how many wins a team had in a sesaon, their ator and their opponenets ator.
+```{r, output=FALSE}
+season_ator <- ator_only %>% 
+  group_by(Season, TeamFull, Conference) %>% 
+  summarize(season_team_ator = sum(TeamAssists)/sum(TeamTurnovers),
+            season_opp_ator = sum(OpponentAssists)/sum(OpponentTurnovers),
+            total_wins = sum(winloss)
+            )
+
+ator_only %>% 
+  filter(TeamFull == "Maryland Terrapins")
+
+# To filter for a specific team, inster this: filter(TeamFull == "team_name")
+```
+
+```{r, output=FALSE}
+#filtering for the ators I want
+
+p5_teams <- season_ator %>% 
+  filter(Conference %in% power_5, Season == "2022-2023")
+
+b10 <- season_ator %>% 
+filter(Conference == "Big Ten", Season == "2022-2023")
+
+umd <- ator_only %>% 
+  filter(TeamFull == "Maryland Terrapins")
+```
+
 ```{r}
-logs18_24 %>%
-  select(Season, Date, TeamFull, Conference, Opponent, TeamScore, OpponentScore, winloss, TeamAssists, TeamTurnovers, OpponentAssists, OpponentTurnovers, team_ator, opp_ator, pts_diff)
+ggplot() +
+  geom_point(data = p5_teams, aes(x = total_wins, y = season_team_ator))+
+   geom_text_repel(data = b10, aes(x = total_wins, y = season_team_ator, label = TeamFull))+
+  labs(x = "Total Wins",
+       y = "Assist to turnover ratio",
+       title = "2022-23 seaosn ator",
+       subtitle = "Shows all p5 ators from last season with b10 teams labeled",
+       caption = "Source: Sports Reference | Chart by Dylan Manfre")
 ```
-
-
-
-
-
-
-
-
-
-data cleaning
+Conference ator over the years
 ```{r}
-logs22_23 <- logs22_23 %>%
-  rename(
-    team_ator = ast_tov_ratio,
-    opp_ator = opp_ast_tov_ratio,
-    win_loss = win) %>%
-  mutate(
-    winner = ifelse(opp_pts > pts, away_team_name, home_team_name),
-    loser = ifelse(pts > opp_pts, away_team_name, home_team_name),
-    winning_conference = ifelse(opp_pts > pts, away_team_conference, home_team_conference),
-    losing_conference = ifelse(pts > opp_pts, away_team_conference, home_team_conference),
-    winning_ator = ifelse(winner == home_team_name, team_ator, opp_ator),
-    losing_ator = ifelse(loser == away_team_name, opp_ator, team_ator),
-    difference = pts - opp_pts,
-    season = "2022-2023")
+
+ator_only %>% 
+  filter(Conference %in% power_5) %>% 
+  group_by(Season, Conference) %>% 
+  summarise(conf_ator = sum(TeamAssists)/sum(TeamTurnovers))
+  
 
 ```
-
-
-```{r}
-#picking columns I want
-ator_only <- logs22_23 %>%
-  select(gamedate_east, home_team_name, home_team_conference, pts, away_team_name, away_team_conference, opp_pts, winner, loser, winning_conference, losing_conference, ast, tov, opp_ast, opp_tov, team_ator, opp_ator, difference, winning_ator, losing_ator)
-
-```
-Establishing a teams record for the 2022-23 seaosn. 
-```{r}
-win_counts <- ator_only %>%
-  group_by(team = winner) %>%
-  summarise(wins = n()) %>%
-  arrange(desc(wins)
-```
-
-
-
 
 
 

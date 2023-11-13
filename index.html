@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dylan Manfre">
+<meta name="dcterms.date" content="2023-11-10">
+
+<title>Does ATOR actually lead to wins?</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="index_files/libs/clipboard/clipboard.min.js"></script>
+<script src="index_files/libs/quarto-html/quarto.js"></script>
+<script src="index_files/libs/quarto-html/popper.min.js"></script>
+<script src="index_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="index_files/libs/quarto-html/anchor.min.js"></script>
+<link href="index_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="index_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="index_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="index_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="index_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Does ATOR actually lead to wins?</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dylan Manfre </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">November 10, 2023</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<p>Early notes: Data comes from Sports Reference</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggrepel)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>logs18_24 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://thescoop.org/sports-data-files/wbblogs1824.csv"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#62,584 records ovver 2018-present</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>establishing lists</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>power_5 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"ACC"</span>, <span class="st">"Big 12"</span>, <span class="st">"Big Ten"</span>, <span class="st">"Pac-12"</span>, <span class="st">"SEC"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>——– data cleaning ————-</p>
+<section id="duplicates-of-the-team-and-date-but-different-stats.-many-of-these-games-have-reocrds-and-others-dont" class="level1">
+<h1>56 duplicates of the team and date but different stats. Many of these games have reocrds and others don’t</h1>
+</section>
+<section id="we-need-to-get-rid-of-the-ones-where-and-assists-and-turnovers-are-na-because-we-cant-id-an-ator-for-them." class="level1">
+<h1>We need to get rid of the ones where and assists and turnovers are NA because we cant ID an ator for them.</h1>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>logs18_24 <span class="sc">%&gt;%</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_dupes</span>(Date, TeamFull)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>         Date                           TeamFull dupe_count    Season Game
+1  2017-11-22                   Grambling Tigers          2 2017-2018    5
+2  2017-11-22                   Grambling Tigers          2 2017-2018    6
+3  2017-11-29                  Tulane Green Wave          2 2017-2018    7
+4  2017-11-29                  Tulane Green Wave          2 2017-2018    8
+5  2017-12-03            Louisiana Ragin' Cajuns          2 2017-2018    8
+6  2017-12-03            Louisiana Ragin' Cajuns          2 2017-2018    9
+7  2017-12-18            Louisiana Tech Bulldogs          2 2017-2018   11
+8  2017-12-18            Louisiana Tech Bulldogs          2 2017-2018   12
+9  2017-12-22                       SMU Mustangs          2 2017-2018   12
+10 2017-12-22                       SMU Mustangs          2 2017-2018   13
+11 2017-12-28           Incarnate Word Cardinals          2 2017-2018   12
+12 2017-12-28           Incarnate Word Cardinals          2 2017-2018   13
+13 2017-12-30          Northwestern State Demons          2 2017-2018   13
+14 2017-12-30          Northwestern State Demons          2 2017-2018   14
+15 2018-01-03         Abilene Christian Wildcats          2 2017-2018   13
+16 2018-01-03         Abilene Christian Wildcats          2 2017-2018   14
+17 2018-01-06             New Orleans Privateers          2 2017-2018   15
+18 2018-01-06             New Orleans Privateers          2 2017-2018   16
+19 2018-01-10            Nicholls State Colonels          2 2017-2018   16
+20 2018-01-10            Nicholls State Colonels          2 2017-2018   17
+21 2018-01-13       Southeastern Louisiana Lions          2 2017-2018   16
+22 2018-01-13       Southeastern Louisiana Lions          2 2017-2018   17
+23 2018-01-20          Houston Christian Huskies          2 2017-2018   17
+24 2018-01-20          Houston Christian Huskies          2 2017-2018   18
+25 2018-01-27                    Lamar Cardinals          2 2017-2018   19
+26 2018-01-27                    Lamar Cardinals          2 2017-2018   20
+27 2018-01-31         Sam Houston State Bearkats          2 2017-2018   19
+28 2018-01-31         Sam Houston State Bearkats          2 2017-2018   20
+29 2018-02-03          Northwestern State Demons          2 2017-2018   23
+30 2018-02-03          Northwestern State Demons          2 2017-2018   24
+31 2018-02-07      Stephen F. Austin Lumberjacks          2 2017-2018   22
+32 2018-02-07      Stephen F. Austin Lumberjacks          2 2017-2018   23
+33 2018-02-10       Southeastern Louisiana Lions          2 2017-2018   25
+34 2018-02-10       Southeastern Louisiana Lions          2 2017-2018   26
+35 2018-02-14             Central Arkansas Bears          2 2017-2018   24
+36 2018-02-14             Central Arkansas Bears          2 2017-2018   25
+37 2018-02-17             New Orleans Privateers          2 2017-2018   27
+38 2018-02-17             New Orleans Privateers          2 2017-2018   28
+39 2018-02-21            Nicholls State Colonels          2 2017-2018   27
+40 2018-02-21            Nicholls State Colonels          2 2017-2018   28
+41 2018-02-24          Houston Christian Huskies          2 2017-2018   27
+42 2018-02-24          Houston Christian Huskies          2 2017-2018   28
+43 2018-02-28 Texas A&amp;M-Corpus Christi Islanders          2 2017-2018   28
+44 2018-02-28 Texas A&amp;M-Corpus Christi Islanders          2 2017-2018   29
+45 2018-03-03                    Lamar Cardinals          2 2017-2018   29
+46 2018-03-03                    Lamar Cardinals          2 2017-2018   30
+47 2018-03-08 Texas A&amp;M-Corpus Christi Islanders          2 2017-2018   31
+48 2018-03-08 Texas A&amp;M-Corpus Christi Islanders          2 2017-2018   32
+49 2018-11-24                    American Eagles          2 2018-2019    4
+50 2018-11-24                    American Eagles          2 2018-2019    5
+51 2018-11-24            Hawaii Rainbow Warriors          2 2018-2019    6
+52 2018-11-24            Hawaii Rainbow Warriors          2 2018-2019    7
+53 2019-11-24                       Oregon Ducks          2 2019-2020    4
+54 2019-11-24                       Oregon Ducks          2 2019-2020    5
+55 2023-01-25              Chicago State Cougars          2 2022-2023   17
+56 2023-01-25              Chicago State Cougars          2 2022-2023   22
+             Opponent HomeAway      W_L TeamScore OpponentScore TeamFG TeamFGA
+1       McNeese State        @        W        60            60     28      65
+2       McNeese State        @        W        75            60     28      65
+3       McNeese State        @        W        66            66     20      54
+4       McNeese State        @        W        70            66     20      54
+5       McNeese State     &lt;NA&gt; W&nbsp;(3 OT)        86            86     34      68
+6       McNeese State     &lt;NA&gt; W&nbsp;(3 OT)        98            86     34      68
+7       McNeese State     &lt;NA&gt;        W        62            62     29      54
+8       McNeese State     &lt;NA&gt;        W        78            62     29      54
+9       McNeese State     &lt;NA&gt;        W        59            59     23      65
+10      McNeese State     &lt;NA&gt;        W        65            59     23      65
+11      McNeese State     &lt;NA&gt;        L        66            66     21      50
+12      McNeese State     &lt;NA&gt;        L        57            66     21      50
+13      McNeese State        @        L        72            72     22      49
+14      McNeese State        @        L        67            72     22      49
+15      McNeese State        @        W        75            75     23      49
+16      McNeese State        @        W        80            75     23      49
+17      McNeese State        @        W        64            64     28      59
+18      McNeese State        @        W        77            64     28      59
+19      McNeese State        @        W        54            54     19      51
+20      McNeese State        @        W        61            54     19      51
+21      McNeese State     &lt;NA&gt;        L        77            77     23      74
+22      McNeese State     &lt;NA&gt;        L        65            77     23      74
+23      McNeese State     &lt;NA&gt;        L        86            86     27      58
+24      McNeese State     &lt;NA&gt;        L        74            86     27      58
+25      McNeese State     &lt;NA&gt;        W        58            58     29      77
+26      McNeese State     &lt;NA&gt;        W        83            58     29      77
+27      McNeese State     &lt;NA&gt;        L        66            66     24      64
+28      McNeese State     &lt;NA&gt;        L        63            66     24      64
+29      McNeese State     &lt;NA&gt;        L        60            60     16      49
+30      McNeese State     &lt;NA&gt;        L        44            60     16      49
+31      McNeese State     &lt;NA&gt;        W        58            58     23      54
+32      McNeese State     &lt;NA&gt;        W        73            58     23      54
+33      McNeese State        @        L        69            69     16      63
+34      McNeese State        @        L        47            69     16      63
+35      McNeese State        @        W        45            45     20      66
+36      McNeese State        @        W        51            45     20      66
+37      McNeese State     &lt;NA&gt;        W        62            62     28      65
+38      McNeese State     &lt;NA&gt;        W        84            62     28      65
+39      McNeese State     &lt;NA&gt;        W        51            51     20      66
+40      McNeese State     &lt;NA&gt;        W        63            51     20      66
+41      McNeese State        @ W&nbsp;(1 OT)        61            61     28      73
+42      McNeese State        @ W&nbsp;(1 OT)        67            61     28      73
+43      McNeese State        @        L        70            70     24      63
+44      McNeese State        @        L        64            70     24      63
+45      McNeese State        @        W        72            72     30      74
+46      McNeese State        @        W        81            72     30      74
+47      McNeese State        N        W        52            52     28      73
+48      McNeese State        N        W        75            52     28      73
+49             Hawaii        @        W        69            57     14      48
+50           Stanford        @        L        49            71     17      46
+51           American     &lt;NA&gt;        L        57            69     21      45
+52 Florida Gulf Coast     &lt;NA&gt;        L        67            73     20      45
+53     Oklahoma State     &lt;NA&gt;        W        89            72     35      76
+54           Syracuse        @        W        81            64     28      65
+55       Northwestern        @        L        64            87     23      78
+56   St. Francis (IL)     &lt;NA&gt;        L        62            72     21      69
+   TeamFGPCT Team3P Team3PA Team3PPCT TeamFT TeamFTA TeamFTPCT TeamOffRebounds
+1      0.431     10      25     0.400      9      12     0.750              17
+2      0.431     10      25     0.400      9      12     0.750              17
+3      0.370      5      14     0.357     25      31     0.806              11
+4      0.370      5      14     0.357     25      31     0.806              11
+5      0.500      4       9     0.444     26      43     0.605               9
+6      0.500      4       9     0.444     26      43     0.605               9
+7      0.537      6      12     0.500     14      20     0.700               8
+8      0.537      6      12     0.500     14      20     0.700               8
+9      0.354      7      26     0.269     12      18     0.667              13
+10     0.354      7      26     0.269     12      18     0.667              13
+11     0.420      5      23     0.217     10      24     0.417               6
+12     0.420      5      23     0.217     10      24     0.417               6
+13     0.449      9      23     0.391     14      18     0.778               6
+14     0.449      9      23     0.391     14      18     0.778               6
+15     0.469      9      19     0.474     25      28     0.893              10
+16     0.469      9      19     0.474     25      28     0.893              10
+17     0.475      9      21     0.429     12      15     0.800               7
+18     0.475      9      21     0.429     12      15     0.800               7
+19     0.373      4      13     0.308     19      25     0.760               3
+20     0.373      4      13     0.308     19      25     0.760               3
+21     0.311      6      21     0.286     13      18     0.722              12
+22     0.311      6      21     0.286     13      18     0.722              12
+23     0.466      6      13     0.462     14      23     0.609              16
+24     0.466      6      13     0.462     14      23     0.609              16
+25     0.377      5      21     0.238     20      28     0.714              19
+26     0.377      5      21     0.238     20      28     0.714              19
+27     0.375      6      17     0.353      9      16     0.563              21
+28     0.375      6      17     0.353      9      16     0.563              21
+29     0.327      5      12     0.417      7      10     0.700               6
+30     0.327      5      12     0.417      7      10     0.700               6
+31     0.426      7      26     0.269     20      27     0.741              12
+32     0.426      7      26     0.269     20      27     0.741              12
+33     0.254      4      20     0.200     11      14     0.786              15
+34     0.254      4      20     0.200     11      14     0.786              15
+35     0.303      1      20     0.050     10      19     0.526              18
+36     0.303      1      20     0.050     10      19     0.526              18
+37     0.431      4      17     0.235     24      29     0.828              14
+38     0.431      4      17     0.235     24      29     0.828              14
+39     0.303      5      21     0.238     18      28     0.643              18
+40     0.303      5      21     0.238     18      28     0.643              18
+41     0.384      3      19     0.158      8      19     0.421              13
+42     0.384      3      19     0.158      8      19     0.421              13
+43     0.381      9      23     0.391      7       9     0.778              11
+44     0.381      9      23     0.391      7       9     0.778              11
+45     0.405      4      16     0.250     17      33     0.515              23
+46     0.405      4      16     0.250     17      33     0.515              23
+47     0.384      7      20     0.350     12      14     0.857              18
+48     0.384      7      20     0.350     12      14     0.857              18
+49     0.292      5      18     0.278     36      40     0.900              12
+50     0.370      3      12     0.250     12      15     0.800               4
+51     0.467      6      24     0.250      9      16     0.563               3
+52     0.444      7      11     0.636     20      25     0.800               7
+53     0.461     11      35     0.314      8      11     0.727              12
+54     0.431     11      30     0.367     14      20     0.700              16
+55     0.295      3      14     0.214     15      20     0.750               9
+56     0.304      5      21     0.238     15      22     0.682               9
+   TeamTotalRebounds TeamAssists TeamSteals TeamBlocks TeamTurnovers
+1                 40          19          7          2            20
+2                 40          19          7          2            20
+3                 39           9          4          7            14
+4                 39           9          4          7            14
+5                 39           9         13          2            23
+6                 39           9         13          2            23
+7                 32          17          9          7            15
+8                 32          17          9          7            15
+9                 44          17          5          3            14
+10                44          17          5          3            14
+11                23          12          8         11            17
+12                23          12          8         11            17
+13                26          17          8          1            18
+14                26          17          8          1            18
+15                27          12          7          7            17
+16                27          12          7          7            17
+17                32          18          3          2            20
+18                32          18          3          2            20
+19                29           9         12          3            16
+20                29           9         12          3            16
+21                35           6          7          1            10
+22                35           6          7          1            10
+23                35          13          4          9            21
+24                35          13          4          9            21
+25                43          15         14          5            13
+26                43          15         14          5            13
+27                44          16          8          2            18
+28                44          16          8          2            18
+29                27          13         10          3            22
+30                27          13         10          3            22
+31                34          15          9          7            14
+32                34          15          9          7            14
+33                36           7         11          1            18
+34                36           7         11          1            18
+35                41           8          4          2             4
+36                41           8          4          2             4
+37                41          16         16          3            18
+38                41          16         16          3            18
+39                45          13         10          4            14
+40                45          13         10          4            14
+41                49          13         10          1            16
+42                49          13         10          1            16
+43                36          11          8          2            20
+44                36          11          8          2            20
+45                44          17         19          2            18
+46                44          17         19          2            18
+47                44          11         12          2             9
+48                44          11         12          2             9
+49                34          10          9          0            14
+50                23          10          3          1            16
+51                23          17          9          4            18
+52                29          15          2          4            19
+53                42          19          3          1            10
+54                42          21          5          2            14
+55                35          14         10          4            12
+56                38          11          5          4            13
+   TeamPersonalFouls OpponentFG OpponentFGA OpponentFGPCT Opponent3P
+1                 23         NA          NA            NA         NA
+2                 23         20          52         0.385          5
+3                 20         NA          NA            NA         NA
+4                 20         22          71         0.310          8
+5                 22         NA          NA            NA         NA
+6                 22         31          77         0.403          7
+7                 19         NA          NA            NA         NA
+8                 19         22          61         0.361          3
+9                 16         NA          NA            NA         NA
+10                16         19          62         0.306         10
+11                20         NA          NA            NA         NA
+12                20         24          66         0.364          4
+13                33         NA          NA            NA         NA
+14                33         23          60         0.383          6
+15                21         NA          NA            NA         NA
+16                21         23          66         0.348          5
+17                16         NA          NA            NA         NA
+18                16         27          69         0.391          4
+19                15         NA          NA            NA         NA
+20                15         18          65         0.277          6
+21                25         NA          NA            NA         NA
+22                25         22          58         0.379          7
+23                23         NA          NA            NA         NA
+24                23         32          68         0.471          5
+25                16         NA          NA            NA         NA
+26                16         24          61         0.393          4
+27                15         NA          NA            NA         NA
+28                15         23          51         0.451         10
+29                17         NA          NA            NA         NA
+30                17         21          59         0.356          6
+31                15         NA          NA            NA         NA
+32                15         22          62         0.355          2
+33                19         NA          NA            NA         NA
+34                19         23          57         0.404         10
+35                 9         NA          NA            NA         NA
+36                 9         17          49         0.347          5
+37                22         NA          NA            NA         NA
+38                22         23          69         0.333          7
+39                19         NA          NA            NA         NA
+40                19         18          59         0.305          4
+41                19         NA          NA            NA         NA
+42                19         22          65         0.338          3
+43                20         NA          NA            NA         NA
+44                20         25          59         0.424          7
+45                16         NA          NA            NA         NA
+46                16         25          53         0.472         10
+47                11         NA          NA            NA         NA
+48                11         19          58         0.328          7
+49                17         21          45         0.467          6
+50                19         26          62         0.419          7
+51                28         14          48         0.292          5
+52                23         25          58         0.431          6
+53                10         30          71         0.423          4
+54                16         23          64         0.359         10
+55                29         28          75         0.373          3
+56                24         23          64         0.359          3
+   Opponent3PA Opponent3PPCT OpponentFT OpponentFTA OpponentFTPCT
+1           NA            NA         NA          NA            NA
+2           16         0.313         15          25         0.600
+3           NA            NA         NA          NA            NA
+4           28         0.286         14          22         0.636
+5           NA            NA         NA          NA            NA
+6           19         0.368         17          24         0.708
+7           NA            NA         NA          NA            NA
+8           16         0.188         15          21         0.714
+9           NA            NA         NA          NA            NA
+10          33         0.303         11          14         0.786
+11          NA            NA         NA          NA            NA
+12          17         0.235         14          17         0.824
+13          NA            NA         NA          NA            NA
+14          20         0.300         20          31         0.645
+15          NA            NA         NA          NA            NA
+16          23         0.217         24          27         0.889
+17          NA            NA         NA          NA            NA
+18          22         0.182          6          11         0.545
+19          NA            NA         NA          NA            NA
+20          26         0.231         12          18         0.667
+21          NA            NA         NA          NA            NA
+22          22         0.318         26          35         0.743
+23          NA            NA         NA          NA            NA
+24          13         0.385         17          28         0.607
+25          NA            NA         NA          NA            NA
+26          20         0.200          6          13         0.462
+27          NA            NA         NA          NA            NA
+28          19         0.526         10          17         0.588
+29          NA            NA         NA          NA            NA
+30          23         0.261         12          20         0.600
+31          NA            NA         NA          NA            NA
+32          13         0.154         12          15         0.800
+33          NA            NA         NA          NA            NA
+34          23         0.435         13          18         0.722
+35          NA            NA         NA          NA            NA
+36          16         0.313          6           8         0.750
+37          NA            NA         NA          NA            NA
+38          27         0.259          9          17         0.529
+39          NA            NA         NA          NA            NA
+40          21         0.190         11          18         0.611
+41          NA            NA         NA          NA            NA
+42          15         0.200         14          23         0.609
+43          NA            NA         NA          NA            NA
+44          16         0.438         13          18         0.722
+45          NA            NA         NA          NA            NA
+46          24         0.417         12          15         0.800
+47          NA            NA         NA          NA            NA
+48          20         0.350          7          10         0.700
+49          24         0.250          9          16         0.563
+50          22         0.318         12          17         0.706
+51          18         0.278         36          40         0.900
+52          21         0.286         17          23         0.739
+53          17         0.235          8           9         0.889
+54          35         0.286          8          12         0.667
+55          19         0.158         28          34         0.824
+56          15         0.200         23          36         0.639
+   OpponentOffRebounds OpponentTotalRebounds OpponentAssists OpponentSteals
+1                   NA                    NA              NA             NA
+2                   12                    30              12              9
+3                   NA                    NA              NA             NA
+4                   16                    40              13              7
+5                   NA                    NA              NA             NA
+6                   15                    47              10             18
+7                   NA                    NA              NA             NA
+8                   12                    30              14              8
+9                   NA                    NA              NA             NA
+10                   9                    33              14              4
+11                  NA                    NA              NA             NA
+12                  14                    38               9             10
+13                  NA                    NA              NA             NA
+14                  21                    41              14              4
+15                  NA                    NA              NA             NA
+16                  18                    32              15              9
+17                  NA                    NA              NA             NA
+18                  16                    38              18              9
+19                  NA                    NA              NA             NA
+20                  19                    52              12              8
+21                  NA                    NA              NA             NA
+22                  13                    47               9              3
+23                  NA                    NA              NA             NA
+24                  13                    32              13             10
+25                  NA                    NA              NA             NA
+26                  13                    42              15              6
+27                  NA                    NA              NA             NA
+28                   7                    25              15              7
+29                  NA                    NA              NA             NA
+30                  17                    42              14             14
+31                  NA                    NA              NA             NA
+32                  16                    33              13              8
+33                  NA                    NA              NA             NA
+34                  11                    41              20              8
+35                  NA                    NA              NA             NA
+36                   6                    33              11              1
+37                  NA                    NA              NA             NA
+38                  12                    31              10              9
+39                  NA                    NA              NA             NA
+40                   9                    37              10             10
+41                  NA                    NA              NA             NA
+42                  11                    43               7              3
+43                  NA                    NA              NA             NA
+44                   9                    34              13              8
+45                  NA                    NA              NA             NA
+46                   5                    30              15             12
+47                  NA                    NA              NA             NA
+48                  10                    33              11              6
+49                   3                    23              17              9
+50                  11                    34              18             12
+51                  12                    34              10              9
+52                   9                    25              10             11
+53                   7                    34              15              6
+54                  10                    32              13              5
+55                  17                    57              19              6
+56                  11                    48              11              7
+   OpponentBlocks OpponentTurnovers OpponentPersonalFouls
+1              NA                NA                    NA
+2               3                15                    15
+3              NA                NA                    NA
+4               2                 9                    25
+5              NA                NA                    NA
+6               3                27                    32
+7              NA                NA                    NA
+8               1                18                    16
+9              NA                NA                    NA
+10              1                14                    21
+11             NA                NA                    NA
+12              0                15                    21
+13             NA                NA                    NA
+14              1                16                    17
+15             NA                NA                    NA
+16              2                14                    22
+17             NA                NA                    NA
+18              1                15                    20
+19             NA                NA                    NA
+20              1                19                    18
+21             NA                NA                    NA
+22              5                17                    19
+23             NA                NA                    NA
+24              2                 9                    21
+25             NA                NA                    NA
+26              4                29                    24
+27             NA                NA                    NA
+28              2                19                    17
+29             NA                NA                    NA
+30              4                16                    15
+31             NA                NA                    NA
+32              1                17                    22
+33             NA                NA                    NA
+34              3                20                    15
+35             NA                NA                    NA
+36              2                11                    19
+37             NA                NA                    NA
+38              1                23                    22
+39             NA                NA                    NA
+40              3                18                    23
+41             NA                NA                    NA
+42              4                21                    15
+43             NA                NA                    NA
+44              2                14                    14
+45             NA                NA                    NA
+46              1                27                    21
+47             NA                NA                    NA
+48              6                17                    15
+49              4                18                    28
+50              2                12                    16
+51              0                14                    17
+52              1                11                    22
+53              2                10                    13
+54              1                11                    20
+55              8                18                    18
+56              3                12                    22
+                                                    URL    Conference
+1                /cbb/schools/grambling/women/2018.html      SWAC WBB
+2                /cbb/schools/grambling/women/2018.html      SWAC WBB
+3                   /cbb/schools/tulane/women/2018.html       AAC WBB
+4                   /cbb/schools/tulane/women/2018.html       AAC WBB
+5      /cbb/schools/louisiana-lafayette/women/2018.html  Sun Belt WBB
+6      /cbb/schools/louisiana-lafayette/women/2018.html  Sun Belt WBB
+7           /cbb/schools/louisiana-tech/women/2018.html      CUSA WBB
+8           /cbb/schools/louisiana-tech/women/2018.html      CUSA WBB
+9       /cbb/schools/southern-methodist/women/2018.html       AAC WBB
+10      /cbb/schools/southern-methodist/women/2018.html       AAC WBB
+11          /cbb/schools/incarnate-word/women/2018.html Southland WBB
+12          /cbb/schools/incarnate-word/women/2018.html Southland WBB
+13      /cbb/schools/northwestern-state/women/2018.html Southland WBB
+14      /cbb/schools/northwestern-state/women/2018.html Southland WBB
+15       /cbb/schools/abilene-christian/women/2018.html Southland WBB
+16       /cbb/schools/abilene-christian/women/2018.html Southland WBB
+17             /cbb/schools/new-orleans/women/2018.html Southland WBB
+18             /cbb/schools/new-orleans/women/2018.html Southland WBB
+19          /cbb/schools/nicholls-state/women/2018.html Southland WBB
+20          /cbb/schools/nicholls-state/women/2018.html Southland WBB
+21  /cbb/schools/southeastern-louisiana/women/2018.html Southland WBB
+22  /cbb/schools/southeastern-louisiana/women/2018.html Southland WBB
+23         /cbb/schools/houston-baptist/women/2018.html Southland WBB
+24         /cbb/schools/houston-baptist/women/2018.html Southland WBB
+25                   /cbb/schools/lamar/women/2018.html Southland WBB
+26                   /cbb/schools/lamar/women/2018.html Southland WBB
+27       /cbb/schools/sam-houston-state/women/2018.html Southland WBB
+28       /cbb/schools/sam-houston-state/women/2018.html Southland WBB
+29      /cbb/schools/northwestern-state/women/2018.html Southland WBB
+30      /cbb/schools/northwestern-state/women/2018.html Southland WBB
+31        /cbb/schools/stephen-f-austin/women/2018.html Southland WBB
+32        /cbb/schools/stephen-f-austin/women/2018.html Southland WBB
+33  /cbb/schools/southeastern-louisiana/women/2018.html Southland WBB
+34  /cbb/schools/southeastern-louisiana/women/2018.html Southland WBB
+35        /cbb/schools/central-arkansas/women/2018.html Southland WBB
+36        /cbb/schools/central-arkansas/women/2018.html Southland WBB
+37             /cbb/schools/new-orleans/women/2018.html Southland WBB
+38             /cbb/schools/new-orleans/women/2018.html Southland WBB
+39          /cbb/schools/nicholls-state/women/2018.html Southland WBB
+40          /cbb/schools/nicholls-state/women/2018.html Southland WBB
+41         /cbb/schools/houston-baptist/women/2018.html Southland WBB
+42         /cbb/schools/houston-baptist/women/2018.html Southland WBB
+43 /cbb/schools/texas-am-corpus-christi/women/2018.html Southland WBB
+44 /cbb/schools/texas-am-corpus-christi/women/2018.html Southland WBB
+45                   /cbb/schools/lamar/women/2018.html Southland WBB
+46                   /cbb/schools/lamar/women/2018.html Southland WBB
+47 /cbb/schools/texas-am-corpus-christi/women/2018.html Southland WBB
+48 /cbb/schools/texas-am-corpus-christi/women/2018.html Southland WBB
+49                /cbb/schools/american/women/2019.html   Patriot WBB
+50                /cbb/schools/american/women/2019.html   Patriot WBB
+51                  /cbb/schools/hawaii/women/2019.html  Big West WBB
+52                  /cbb/schools/hawaii/women/2019.html  Big West WBB
+53                  /cbb/schools/oregon/women/2020.html    Pac-12 WBB
+54                  /cbb/schools/oregon/women/2020.html    Pac-12 WBB
+55           /cbb/schools/chicago-state/women/2023.html   Independent
+56           /cbb/schools/chicago-state/women/2023.html   Independent
+                       Team TeamSRS TeamSOS OpponentSRS OpponentSOS
+1                 Grambling  -11.97  -10.36      -14.52       -6.70
+2                 Grambling  -11.97  -10.36      -14.52       -6.70
+3                    Tulane    4.29    8.10      -14.52       -6.70
+4                    Tulane    4.29    8.10      -14.52       -6.70
+5                 Louisiana   -5.25   -3.56      -14.52       -6.70
+6                 Louisiana   -5.25   -3.56      -14.52       -6.70
+7            Louisiana Tech    2.80   -2.17      -14.52       -6.70
+8            Louisiana Tech    2.80   -2.17      -14.52       -6.70
+9        Southern Methodist   -0.60    4.73      -14.52       -6.70
+10       Southern Methodist   -0.60    4.73      -14.52       -6.70
+11           Incarnate Word  -21.35   -4.39      -14.52       -6.70
+12           Incarnate Word  -21.35   -4.39      -14.52       -6.70
+13       Northwestern State  -20.74   -5.62      -14.52       -6.70
+14       Northwestern State  -20.74   -5.62      -14.52       -6.70
+15        Abilene Christian  -11.52   -8.56      -14.52       -6.70
+16        Abilene Christian  -11.52   -8.56      -14.52       -6.70
+17              New Orleans   -9.47   -8.37      -14.52       -6.70
+18              New Orleans   -9.47   -8.37      -14.52       -6.70
+19           Nicholls State   -7.22   -5.62      -14.52       -6.70
+20           Nicholls State   -7.22   -5.62      -14.52       -6.70
+21   Southeastern Louisiana  -16.96   -7.58      -14.52       -6.70
+22   Southeastern Louisiana  -16.96   -7.58      -14.52       -6.70
+23        Houston Christian  -19.89   -8.43      -14.52       -6.70
+24        Houston Christian  -19.89   -8.43      -14.52       -6.70
+25                    Lamar    2.84   -6.59      -14.52       -6.70
+26                    Lamar    2.84   -6.59      -14.52       -6.70
+27        Sam Houston State  -21.93   -6.93      -14.52       -6.70
+28        Sam Houston State  -21.93   -6.93      -14.52       -6.70
+29       Northwestern State  -20.74   -5.62      -14.52       -6.70
+30       Northwestern State  -20.74   -5.62      -14.52       -6.70
+31        Stephen F. Austin   -1.18   -9.93      -14.52       -6.70
+32        Stephen F. Austin   -1.18   -9.93      -14.52       -6.70
+33   Southeastern Louisiana  -16.96   -7.58      -14.52       -6.70
+34   Southeastern Louisiana  -16.96   -7.58      -14.52       -6.70
+35         Central Arkansas   -0.63   -5.96      -14.52       -6.70
+36         Central Arkansas   -0.63   -5.96      -14.52       -6.70
+37              New Orleans   -9.47   -8.37      -14.52       -6.70
+38              New Orleans   -9.47   -8.37      -14.52       -6.70
+39           Nicholls State   -7.22   -5.62      -14.52       -6.70
+40           Nicholls State   -7.22   -5.62      -14.52       -6.70
+41        Houston Christian  -19.89   -8.43      -14.52       -6.70
+42        Houston Christian  -19.89   -8.43      -14.52       -6.70
+43 Texas A&amp;M-Corpus Christi   -9.85  -11.66      -14.52       -6.70
+44 Texas A&amp;M-Corpus Christi   -9.85  -11.66      -14.52       -6.70
+45                    Lamar    2.84   -6.59      -14.52       -6.70
+46                    Lamar    2.84   -6.59      -14.52       -6.70
+47 Texas A&amp;M-Corpus Christi   -9.85  -11.66      -14.52       -6.70
+48 Texas A&amp;M-Corpus Christi   -9.85  -11.66      -14.52       -6.70
+49                 American    2.75   -2.40       -0.61        0.68
+50                 American    2.75   -2.40       29.86       16.66
+51                   Hawaii   -0.61    0.68        2.75       -2.40
+52                   Hawaii   -0.61    0.68       11.83       -5.17
+53                   Oregon   42.89   14.83       15.51       13.81
+54                   Oregon   42.89   14.83       14.43       12.62
+55            Chicago State  -31.92   -7.92        5.85       13.21
+56            Chicago State  -31.92   -7.92          NA          NA</code></pre>
+</div>
+</div>
+</section>
+<section id="now-we-are-working-with-61267-records" class="level1">
+<h1>Now we are working with 61,267 records</h1>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Getting rid of records where an ator cannot be generated</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>logs18_24 <span class="ot">&lt;-</span> logs18_24 <span class="sc">%&gt;%</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(TeamAssists) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(TeamTurnovers) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(OpponentAssists) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(OpponentTurnovers))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>mutating certain columns that I may need for the analysis. team_ator, opp_ator and point differnece.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>logs18_24 <span class="ot">&lt;-</span> logs18_24 <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">winloss =</span> <span class="fu">case_when</span>(</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">grepl</span>(<span class="st">"W"</span>, W_L) <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">grepl</span>(<span class="st">"L"</span>, W_L) <span class="sc">~</span> <span class="dv">0</span>),</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">team_ator =</span> (TeamAssists) <span class="sc">/</span> (TeamTurnovers),</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">opp_ator =</span> (OpponentAssists) <span class="sc">/</span> (OpponentTurnovers),</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">pts_diff =</span> TeamScore <span class="sc">-</span> OpponentScore)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>establishing ator only. These columns will be necessary for my analysis. From here on, the main df will be ator_only.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ator_only <span class="ot">&lt;-</span> logs18_24 <span class="sc">%&gt;%</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Season, Date, TeamFull, Conference, Opponent, TeamScore, OpponentScore, winloss, pts_diff, TeamAssists, TeamTurnovers, OpponentAssists, OpponentTurnovers, team_ator, opp_ator)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>—– exploratory data section ——-</p>
+</section>
+<section id="here-i-want-to-establish-a-data-frame-with-season-teamfull-winloss-team_ator-and-opp_ator." class="level1">
+<h1>Here I want to establish a data frame with season, TeamFull, winloss, team_ator and opp_ator.</h1>
+</section>
+<section id="this-will-show-how-many-wins-a-team-had-in-a-sesaon-their-ator-and-their-opponenets-ator." class="level1">
+<h1>This will show how many wins a team had in a sesaon, their ator and their opponenets ator.</h1>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>season_ator <span class="ot">&lt;-</span> ator_only <span class="sc">%&gt;%</span> </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Season, TeamFull) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">season_team_ator =</span> <span class="fu">sum</span>(TeamAssists)<span class="sc">/</span><span class="fu">sum</span>(TeamTurnovers),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">season_opp_ator =</span> <span class="fu">sum</span>(OpponentAssists)<span class="sc">/</span><span class="fu">sum</span>(OpponentTurnovers),</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">total_wins =</span> <span class="fu">sum</span>(winloss))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'Season'. You can override using the
+`.groups` argument.</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To filter for a specific team, inster this: filter(TeamFull == "team_name")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
