@@ -192,7 +192,7 @@ ggplot(data = umd_years, aes(x = total_wins, y = season_team_ator)) +
   )
 ```
 
-STORY SENTENCE: `Maryland ended last season with 28 wins. 
+STORY SENTENCE: `Maryland ended last season with 28 wins and had the 15th best ratio out of the Division I teams last year.` 
 
 ```{r}
 # This subset shows every seaosn except 2023-2024.
@@ -212,15 +212,24 @@ ggplot() +
   geom_text_repel(data = maryland, aes(x = total_wins, y = season_team_ator, label = TeamFull), colour = "red")+
    geom_point(data = nova, aes(x = total_wins, y = season_team_ator, label = TeamFull), colour = "blue")+
   geom_text_repel(data = nova, aes(x = total_wins, y = season_team_ator, label = TeamFull), colour = "blue")+
+   geom_point(data = b10, aes(x = total_wins, y = season_team_ator, label = TeamFull), colour = "red")+
   labs(x = "Total Wins",
        y = "Assist to turnover ratio",
        title = "2022-23 seaosn ator",
-       subtitle = "Shows all b10 ators from last season with labeled teams",
+       subtitle = "Shows all ators from 2022-23 and Big Ten teams highlighted in Red. Nova is the highest ator",
        caption = "Source: Sports Reference | Chart by Dylan Manfre")
 
 ```
 
+Analyzing Maryland's 7 game win streak late in the season in 2022-23 which was its longest of the year. During that span, Maryland's ator was a 1.3. Its opponenets had a 0.8.
+```{r}
 
+umd_22_23_ator %>%
+  filter(Date >= "2023-02-05", Date <= "2023-03-03") %>% 
+  summarise(seven_game_ator = sum(TeamAssists)/sum(TeamTurnovers),
+              opp_seven_game_ator = sum(OpponentAssists)/sum(OpponentTurnovers))
 
+```
 
+Is there a way to find out what the longest win streak was over the period I have data for?
 

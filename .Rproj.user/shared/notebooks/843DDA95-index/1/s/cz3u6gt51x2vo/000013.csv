@@ -5,11 +5,13 @@ ggplot() +
   geom_text_repel(data = maryland, aes(x = total_wins, y = season_team_ator, label = TeamFull), colour = ""red"")+
    geom_point(data = nova, aes(x = total_wins, y = season_team_ator, label = TeamFull), colour = ""blue"")+
   geom_text_repel(data = nova, aes(x = total_wins, y = season_team_ator, label = TeamFull), colour = ""blue"")+
+   geom_point(data = b10, aes(x = total_wins, y = season_team_ator, label = TeamFull), colour = ""red"")+
   labs(x = ""Total Wins"",
        y = ""Assist to turnover ratio"",
        title = ""2022-23 seaosn ator"",
-       subtitle = ""Shows all b10 ators from last season with labeled teams"",
+       subtitle = ""Shows all ators from 2022-23 and Big Ten teams highlighted in Red. Nova is the highest ator"",
        caption = ""Source: Sports Reference | Chart by Dylan Manfre"")
 "
+"2","Warning: [38;5;253mIgnoring unknown aesthetics: [32mlabel[38;5;253m[39m"
 "2","Warning: [38;5;253mIgnoring unknown aesthetics: [32mlabel[38;5;253m[39m"
 "2","Warning: [38;5;253mIgnoring unknown aesthetics: [32mlabel[38;5;253m[39m"
