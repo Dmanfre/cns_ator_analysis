@@ -1,6 +1,0 @@
-"0","ator_only %>% 
-  filter(Conference == ""Big Ten"") %>% 
-  group_by(Season, Conference) %>% 
-  summarise(conf_ator = sum(TeamAssists)/sum(TeamTurnovers))
-"
-"2","`summarise()` has grouped output by 'Season'. You can override using the `.groups` argument."
