@@ -1,0 +1,11 @@
+"0","ggplot() +
+  geom_point(data = p5_teams, aes(x = total_wins, y = season_team_ator))+
+   geom_text_repel(data = b10, aes(x = total_wins, y = season_team_ator, label = TeamFull))+
+  labs(x = ""Total Wins"",
+       y = ""Assist to turnover ratio"",
+       title = ""2022-23 seaosn ator"",
+       subtitle = ""Shows all p5 ators from last season with b10 teams labeled"",
+       caption = ""Source: Sports Reference | Chart by Dylan Manfre"")
+"
+"2","Error in ggplot() : could not find function ""ggplot""
+"
