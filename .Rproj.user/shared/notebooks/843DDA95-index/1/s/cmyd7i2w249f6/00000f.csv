@@ -1,4 +1,10 @@
-"0","library(tidyverse)"
-"0","library(ggrepel)"
-"0","library(janitor)"
-"0","library(ggplot2)"
+"0","library(ggalt)
+"
+"2","Registered S3 methods overwritten by 'ggalt':
+  method                  from   
+  grid.draw.absoluteGrob  ggplot2
+  grobHeight.absoluteGrob ggplot2
+  grobWidth.absoluteGrob  ggplot2
+  grobX.absoluteGrob      ggplot2
+  grobY.absoluteGrob      ggplot2
+"
