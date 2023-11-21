@@ -1,8 +1,0 @@
-"0","ggplot() +"
-"0","  geom_point(data = b10, aes(x = total_wins, y = season_team_ator))+"
-"0","   geom_text_repel(data = b10, aes(x = total_wins, y = season_team_ator, label = TeamFull))+"
-"0","  labs(x = ""Total Wins"","
-"0","       y = ""Assist to turnover ratio"","
-"0","       title = ""2022-23 seaosn ator"","
-"0","       subtitle = ""Shows all b10 ators from last season with labeled teams"","
-"0","       caption = ""Source: Sports Reference | Chart by Dylan Manfre"")"

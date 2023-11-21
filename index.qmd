@@ -17,6 +17,7 @@ library(ggrepel)
 library(janitor)
 library(ggplot2)
 library(ggalt)
+library(wehoop)
 
 ```
 
@@ -24,6 +25,16 @@ library(ggalt)
 
 logs18_24 <- read.csv("https://thescoop.org/sports-data-files/wbblogs1824.csv")
 #62,584 records ovver 2018-present
+
+season_box <- load_wbb_player_box(2023) %>% 
+   select(game_id, season, season_type, game_date, team_display_name,  athlete_display_name, athlete_position_name, starter, did_not_play, assists, turnovers, team_score, opponent_team_display_name, opponent_team_score) %>% 
+  rename(team = team_display_name,
+         player_name = athlete_display_name,
+         position = athlete_position_name,
+         opponent = opponent_team_display_name,
+         opp_score = opponent_team_score)
+
+
 ```
 
 establishing lists
@@ -259,6 +270,45 @@ ggplot() +
     x = "2022-2023 Assist to turnover ratio",
     title = "Maryland had much better ball control than its opponents last season"
   )
+```
+
+-------- Players data section --------
+
+```{r}
+# I can use the wehoop library for this. 
+
+umd_players <- season_box %>% 
+  filter(team == "Maryland Terrapins") %>% 
+   mutate(player_ator = assists/turnovers)
+
+player_season_ator <- season_box %>% 
+  filter(did_not_play != "TRUE") %>% 
+  group_by(player_name, team) %>% 
+  summarize(player_season_ator = sum(assists)/sum(turnovers)) %>% 
+    filter(player_season_ator != "Inf") %>% 
+  arrange(desc(player_season_ator))
+
+season_box %>% 
+  filter(did_not_play != "TRUE") %>% 
+  group_by(player_name, team) %>% 
+  summarize(player_season_ator = sum(assists)/sum(turnovers)) %>% 
+  filter(player_season_ator != "Inf") %>% 
+  arrange(desc(player_season_ator))
+
+
+umd_players %>% 
+  filter(player_name == "Abby Meyers")
+
+```
+
+```{r}
+# I want to create a column called game_played. when i do a group_by and summarize to get the season_ator for each player, I want to filter out those players who haven't really played many games. The reason for this is becasue if you play one game, and you have an ator of a 9, it puts you high on the list
+
+games_played <- season_box %>% 
+   filter(player_name != "Team" & player_name != "- Team") %>% 
+  group_by(player_name, team) %>% 
+  summarize(games_played = n())
+
 ```
 
 

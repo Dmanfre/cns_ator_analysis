@@ -1,0 +1,7 @@
+"0","# I want to create a column called game_played. when i do a group_by and summarize to get the season_ator for each player, I want to filter out those players who haven't really played many games. The reason for this is becasue if you play one game, and you have an ator of a 9, it puts you high on the list"
+"0",""
+"0","games_played <- season_box %>% "
+"0","   filter(player_name != ""Team"" & player_name != ""- Team"") %>% "
+"0","  group_by(player_name, team) %>% "
+"0","  summarize(games_played = n())"
+"2","`summarise()` has grouped output by 'player_name'. You can override using the `.groups` argument."
