@@ -18,6 +18,7 @@ library(janitor)
 library(ggplot2)
 library(ggalt)
 library(wehoop)
+library(rvest)
 
 ```
 
@@ -26,6 +27,7 @@ library(wehoop)
 logs18_24 <- read.csv("https://thescoop.org/sports-data-files/wbblogs1824.csv")
 #62,584 records ovver 2018-present
 
+# wehoops season box scores
 season_box <- load_wbb_player_box(2023) %>% 
    select(game_id, season, season_type, game_date, team_display_name,  athlete_display_name, athlete_position_name, starter, did_not_play, assists, turnovers, team_score, opponent_team_display_name, opponent_team_score) %>% 
   rename(team = team_display_name,
@@ -210,7 +212,7 @@ STORY SENTENCE: `Maryland ended last season with 28 wins and had the 15th best r
 ```{r}
 # This subset shows every season except 2023-2024.
 
-#adding a differnece column to this
+#adding a difference column to this
 season_ator_2022_23 <-  season_ator %>% 
   filter(Season == "2022-2023") %>% 
   mutate(diff_ator = season_team_ator - season_opp_ator)
@@ -274,42 +276,63 @@ ggplot() +
 
 -------- Players data section --------
 
+# I tried what was below. Goal here was to see if I can create a season_ator for all the players. But the games played is innacurate.
+
+# I had a though of creating a loop and scrapping umd's stats page for a 5 year period, to see who has had the best ator on Maryland over the last five seasons.
+
 ```{r}
 # I can use the wehoop library for this. 
 
-umd_players <- season_box %>% 
-  filter(team == "Maryland Terrapins") %>% 
-   mutate(player_ator = assists/turnovers)
-
-player_season_ator <- season_box %>% 
-  filter(did_not_play != "TRUE") %>% 
-  group_by(player_name, team) %>% 
+# Creating an ator for each player in the database for the whole season
+player_season_ator <- season_box %>%
+  filter(did_not_play == "FALSE") %>% 
+  group_by(season, player_name, team) %>% 
   summarize(player_season_ator = sum(assists)/sum(turnovers)) %>% 
     filter(player_season_ator != "Inf") %>% 
   arrange(desc(player_season_ator))
 
-season_box %>% 
-  filter(did_not_play != "TRUE") %>% 
-  group_by(player_name, team) %>% 
-  summarize(player_season_ator = sum(assists)/sum(turnovers)) %>% 
-  filter(player_season_ator != "Inf") %>% 
-  arrange(desc(player_season_ator))
-
-
-umd_players %>% 
-  filter(player_name == "Abby Meyers")
-
+umd_players <- player_season_ator %>% 
+  filter(team == "Maryland Terrapins") 
 ```
 
 ```{r}
 # I want to create a column called game_played. when i do a group_by and summarize to get the season_ator for each player, I want to filter out those players who haven't really played many games. The reason for this is becasue if you play one game, and you have an ator of a 9, it puts you high on the list
 
 games_played <- season_box %>% 
-   filter(player_name != "Team" & player_name != "- Team") %>% 
+   filter(player_name != "Team") %>% 
   group_by(player_name, team) %>% 
   summarize(games_played = n())
 
+view(games_played)
+# Unsure why player_name "Team" still appears.
 ```
+
+
+```{r}
+joined_players <- inner_join(games_played, player_season_ator, by = "player_name") %>% 
+  select(-team.y)
+
+# Kamara St. Paul of Lehigh is entered 62 times. This is incorrect. According to her player page, she played 5 games. I've updated that below.
+
+new_umd_playrs <- joined_players %>% 
+  filter(team.x == "Maryland Terrapins")
+
+# Now I need to remove the players who have played a small amount of games and have an unreasonable ratio.
+```
+
+
+```{r}
+
+players <- read_csv("data/umd_stats.csv")
+
+players %>% 
+  select(Player, G, MP, AST, TOV) %>% 
+  mutate(ator = AST/TOV) %>% 
+  arrange(desc(ator))
+
+```
+
+
 
 
 
@@ -321,8 +344,6 @@ write_csv(b10, "data/b10.csv")
 write_csv(season_ator_2022_23, "data/season_ator_2022_23.csv")
 
 ```
-
-
 
 
 

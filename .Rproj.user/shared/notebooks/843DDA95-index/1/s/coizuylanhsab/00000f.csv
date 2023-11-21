@@ -1,6 +1,6 @@
 "0","# This subset shows every season except 2023-2024."
 "0",""
-"0","#adding a differnece column to this"
+"0","#adding a difference column to this"
 "0","season_ator_2022_23 <-  season_ator %>% "
 "0","  filter(Season == ""2022-2023"") %>% "
 "0","  mutate(diff_ator = season_team_ator - season_opp_ator)"

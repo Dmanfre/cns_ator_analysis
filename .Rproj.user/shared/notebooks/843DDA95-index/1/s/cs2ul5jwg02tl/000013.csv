@@ -1,5 +1,0 @@
-"0",""
-"0","umd_22_23_ator %>%"
-"0","  filter(Date >= ""2023-02-05"", Date <= ""2023-03-03"") %>% "
-"0","  summarise(seven_game_ator = sum(TeamAssists)/sum(TeamTurnovers),"
-"0","              opp_seven_game_ator = sum(OpponentAssists)/sum(OpponentTurnovers))"

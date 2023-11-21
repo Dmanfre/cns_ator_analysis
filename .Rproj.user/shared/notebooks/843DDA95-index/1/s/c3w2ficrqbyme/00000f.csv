@@ -2,6 +2,7 @@
 "0","logs18_24 <- read.csv(""https://thescoop.org/sports-data-files/wbblogs1824.csv"")"
 "0","#62,584 records ovver 2018-present"
 "0",""
+"0","# wehoops season box scores"
 "0","season_box <- load_wbb_player_box(2023) %>% "
 "0","   select(game_id, season, season_type, game_date, team_display_name,  athlete_display_name, athlete_position_name, starter, did_not_play, assists, turnovers, team_score, opponent_team_display_name, opponent_team_score) %>% "
 "0","  rename(team = team_display_name,"

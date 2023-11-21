@@ -1,0 +1,68 @@
+```{r}
+library(tidyverse)
+library(wehoop)
+library(rvest)
+```
+
+# Goal of this notebook is to create a database of assist to turnover ratios. I want to write a scraper to get the assist to turnover ratios for each player in WCBB. The final produce would be a tibble that has the columns seaosn, player, team, conference, games played, minutes played, assists, turnovers, season_ator. 
+
+```{r}
+url <- "https://www.sports-reference.com/cbb/schools/maryland/women/2023.html"
+```
+
+```{r}
+#step 1
+
+schools <- url |>
+  read_html() |>
+  html_nodes(xpath = '//*[@id="basic_school_stats"]') |>
+  html_nodes("a") |>
+  html_attr('href')
+
+# produced a list of 361
+schools
+
+```
+
+```{r}
+# step 2.
+
+page <- read_html("https://www.sports-reference.com/cbb/schools/maryland/women/2023.html")
+  
+team <- page |>
+  html_nodes(xpath = '//*[@id="meta"]/div[2]/h1/span[2]') |>
+  html_text()
+
+conference <- page |>
+    html_nodes(xpath = '//*[@id="meta"]/div[2]/p[1]/a') |>
+    html_text()
+
+table <- page |>
+  html_nodes(xpath = '//*[@id="totals"]') |>
+  html_table(header=FALSE)
+
+table <- table[[1]] |> rename() %>% mutate
+
+```
+
+
+txtbook scraper 
+
+```{r}
+page <- read_html("https://www.sports-reference.com/cbb/schools/abilene-christian/2023-gamelogs.html")
+  
+team <- page |>
+  html_nodes(xpath = '//*[@id="meta"]/div[2]/h1/span[2]') |>
+  html_text()
+
+conference <- page |>
+    html_nodes(xpath = '//*[@id="meta"]/div[2]/p[1]/a') |>
+    html_text()
+
+table <- page |>
+  html_nodes(xpath = '//*[@id="sgl-basic_NCAAM"]') |>
+  html_table(header=FALSE)
+
+table <- table[[1]] |> rename(Game=X1, Date=X2, HomeAway=X3, Opponent=X4, W_L=X5, TeamScore=X6, OpponentScore=X7, TeamFG=X8, TeamFGA=X9, TeamFGPCT=X10, Team3P=X11, Team3PA=X12, Team3PPCT=X13, TeamFT=X14, TeamFTA=X15, TeamFTPCT=X16, TeamOffRebounds=X17, TeamTotalRebounds=X18, TeamAssists=X19, TeamSteals=X20, TeamBlocks=X21, TeamTurnovers=X22, TeamPersonalFouls=X23, Blank=X24, OpponentFG=X25, OpponentFGA=X26, OpponentFGPCT=X27, Opponent3P=X28, Opponent3PA=X29, Opponent3PPCT=X30, OpponentFT=X31, OpponentFTA=X32, OpponentFTPCT=X33, OpponentOffRebounds=X34, OpponentTotalRebounds=X35, OpponentAssists=X36, OpponentSteals=X37, OpponentBlocks=X38, OpponentTurnovers=X39, OpponentPersonalFouls=X40) |> filter(Game != "") |> filter(Game != "G") |> mutate(Team=team, Conference=conference) |> mutate_at(vars(-Team, -Conference, -Date, -Opponent, -HomeAway, -W_L), as.numeric) |> mutate(Date = ymd(Date)) 
+```
+
