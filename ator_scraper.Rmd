@@ -6,23 +6,6 @@ library(rvest)
 
 # Goal of this notebook is to create a database of assist to turnover ratios. I want to write a scraper to get the assist to turnover ratios for each player in WCBB. The final produce would be a tibble that has the columns seaosn, player, team, conference, games played, minutes played, assists, turnovers, season_ator. 
 
-```{r}
-url <- "https://www.sports-reference.com/cbb/schools/maryland/women/2023.html"
-```
-
-```{r}
-#step 1
-
-schools <- url |>
-  read_html() |>
-  html_nodes(xpath = '//*[@id="basic_school_stats"]') |>
-  html_nodes("a") |>
-  html_attr('href')
-
-# produced a list of 361
-schools
-
-```
 
 ```{r}
 # step 2.
@@ -39,11 +22,20 @@ conference <- page |>
 
 table <- page |>
   html_nodes(xpath = '//*[@id="totals"]') |>
-  html_table(header=FALSE)
-
-table <- table[[1]] |> rename() %>% mutate
+  html_table(header = FALSE)
 
 ```
+
+
+
+```{r}
+players <- read_csv("https://thescoop.org/sports-data-files/wbb_players_2023.csv")
+
+players <- players %>% 
+  select(end_year, player, team, ncaa_conference, ncaa_division, gp, mp, ast, tov, ast_tov_ratio) 
+```
+
+
 
 
 txtbook scraper 
