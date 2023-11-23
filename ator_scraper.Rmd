@@ -24,16 +24,12 @@ table <- page |>
   html_nodes(xpath = '//*[@id="totals"]') |>
   html_table(header = FALSE)
 
+table %>% 
+  mutate(Team = team,
+         confernece = conference)
+
 ```
 
-
-
-```{r}
-players <- read_csv("https://thescoop.org/sports-data-files/wbb_players_2023.csv")
-
-players <- players %>% 
-  select(end_year, player, team, ncaa_conference, ncaa_division, gp, mp, ast, tov, ast_tov_ratio) 
-```
 
 
 

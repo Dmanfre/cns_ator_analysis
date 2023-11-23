@@ -17,9 +17,8 @@ library(ggrepel)
 library(janitor)
 library(ggplot2)
 library(ggalt)
-library(wehoop)
 library(rvest)
-install.packages("ggbeeswarm")
+#install.packages("ggbeeswarm")
 library(ggbeeswarm)
 ```
 
@@ -27,16 +26,6 @@ library(ggbeeswarm)
 
 logs18_24 <- read.csv("https://thescoop.org/sports-data-files/wbblogs1824.csv")
 #62,584 records ovver 2018-present
-
-# wehoops season box scores
-season_box <- load_wbb_player_box(2023) %>% 
-   select(game_id, season, season_type, game_date, team_display_name,  athlete_display_name, athlete_position_name, starter, did_not_play, assists, turnovers, team_score, opponent_team_display_name, opponent_team_score) %>% 
-  rename(team = team_display_name,
-         player_name = athlete_display_name,
-         position = athlete_position_name,
-         opponent = opponent_team_display_name,
-         opp_score = opponent_team_score)
-
 
 ```
 
@@ -285,33 +274,37 @@ ggplot() +
 
 
 ```{r}
+# Data is from Sports Refernece
 players <- read_csv("https://thescoop.org/sports-data-files/wbb_players_2023.csv")
 
 players <- players %>% 
   select(end_year, player, position, team, ncaa_conference, ncaa_division, gp, mp, ast, tov, ast_tov_ratio)
+
+summary(players$gp)
+summary(players$mp)
 ```
 
 Now I need to filter out players who didn't play much or contribute anything to their teams. I also need to filter out players where an ator is NA meaning it could not be calculated.
 
 Average gp is around 20 so I can now filter for players who have played more than that. The average minutes is 392. 
 ```{r}
-summary(players$gp)
-summary(players$mp)
 
 players <- players %>% 
-  filter(gp >= 20, ncaa_division == "1") %>% 
+  filter(gp >= 20, ncaa_division == "1", ast_tov_ratio != 0) %>% 
   arrange(desc(ast_tov_ratio))
 
 umd_players <- players %>% 
   filter(team == "Maryland")
 
+b10_players <- players %>% 
+  filter(ncaa_conference == "Big Ten")
 
 ggplot() + 
-  geom_beeswarm(
-    data=players, 
+  geom_jitter(
+    data=b10_players, 
     groupOnX=TRUE, 
     aes(x=position, y=ast_tov_ratio), color="grey") + 
-  geom_beeswarm(
+  geom_jitter(
     data=umd_players, 
     groupOnX=TRUE, 
     aes(x=position, y=ast_tov_ratio), color="red") +
@@ -322,8 +315,22 @@ ggplot() +
     y= "Assist to turnover ratio",
     x = "Position",
     caption = "Source: Sports Reference | Chart by Dylan Manfre",
-    title = "I'm obcessed with ATOR"
+    title = "I'm obcessed with ATOR",
+    subtitle = "includes players with a minimum of 20 games played"
   )
+```
+Which teams have most players over a 2.0
+```{r}
+
+over_2 <- players %>% 
+  filter(ast_tov_ratio > 2.0) %>% 
+  group_by(team, ncaa_conference, ncaa_division) %>% 
+  summarize(number_of_players = n()) %>% 
+  arrange(desc(number_of_players))
+
+summary(over_2)
+# teams have on average 1.2 players over a 2.0.
+
 ```
 
 
