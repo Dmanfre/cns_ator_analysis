@@ -1,0 +1,7 @@
+"0","over_2 <- players %>% 
+  filter(ast_tov_ratio > 2.0) %>% 
+  group_by(team, ncaa_conference, ncaa_division) %>% 
+  summarize(number_of_players = n()) %>% 
+  arrange(desc(number_of_players))
+"
+"2","`summarise()` has grouped output by 'team', 'ncaa_conference'. You can override using the `.groups` argument."

@@ -1,3 +1,4 @@
 "0","#Getting rid of records where an ator cannot be generated"
-"0","logs18_24 <- logs18_24 %>%"
+"0","logs <- logs %>%"
 "0","  filter(!is.na(TeamAssists) & !is.na(TeamTurnovers) & !is.na(OpponentAssists) & !is.na(OpponentTurnovers))"
+"0",""

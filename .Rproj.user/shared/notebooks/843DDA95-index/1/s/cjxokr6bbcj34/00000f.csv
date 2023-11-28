@@ -1,0 +1,17 @@
+"0","umd_monthly_22_23 <- umd %>%
+  filter(Season == ""2022-2023"") %>%
+  mutate(month = month(Date)) %>%
+  group_by(month) %>% 
+  summarise(monthly_ator = sum(TeamAssists) / sum(TeamTurnovers),
+            opp_monthly_ator = sum(OpponentAssists) / sum(OpponentTurnovers))
+"
+"1","[1m[33mError[39m in `mutate()`:[22m
+[38;5;253m[36mℹ[38;5;253m In argument: `month = month(Date)`.[39m
+[1mCaused by error in `as.POSIXlt.character()`:[22m
+[33m![39m character string is not in a standard unambiguous format
+Backtrace:
+[90m  1. [39m... %>% ...
+[90m 12. [39m[1mlubridate[22m:::month.default(Date)
+[90m 15. [39m[1mbase[22m::as.POSIXlt.character(x, tz = tz(x))
+[90m 16. [39mbase::stop(""character string is not in a standard unambiguous format"")
+"

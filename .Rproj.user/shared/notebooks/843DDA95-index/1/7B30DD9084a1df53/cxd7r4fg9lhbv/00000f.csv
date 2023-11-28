@@ -1,0 +1,2 @@
+"0","ator_only <- logs18_24 %>%"
+"0","  select(Season, Date, TeamFull, Conference, Opponent, TeamScore, OpponentScore, winloss, pts_diff, TeamAssists, TeamTurnovers, OpponentAssists, OpponentTurnovers, team_ator, opp_ator)"

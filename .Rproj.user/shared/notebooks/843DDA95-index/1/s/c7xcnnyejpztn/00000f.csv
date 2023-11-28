@@ -1,0 +1,44 @@
+"0",""
+"0","# Loading data for the seaosns"
+"0","logs24 <- read_csv(""https://thescoop.org/sports-data-files/wbblogs24.csv"")"
+"2","[1mRows: [22m[34m2024[39m [1mColumns: [22m[34m48[39m"
+"2","[36m──[39m [1mColumn specification[22m [36m──────────────────────────────────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "",""
+[31mchr[39m   (8): Season, TeamFull, Opponent, HomeAway, W_L, URL, Conference, Team
+[32mdbl[39m  (39): Game, TeamScore, OpponentScore, TeamFG, TeamFGA, TeamFGPCT, Team3P, Team3PA, Team3PPCT, Tea...
+[34mdate[39m  (1): Date"
+"2","
+[36mℹ[39m Use `spec()` to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set `show_col_types = FALSE` to quiet this message."
+"0","logs18_24 <- read_csv(""https://www.thescoop.org/sports-data-files/wbblogs1824.csv"")"
+"2","[1mRows: [22m[34m62584[39m [1mColumns: [22m[34m48[39m"
+"2","[36m──[39m [1mColumn specification[22m [36m──────────────────────────────────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "",""
+[31mchr[39m   (8): Season, TeamFull, Opponent, HomeAway, W_L, URL, Conference, Team
+[32mdbl[39m  (39): Game, TeamScore, OpponentScore, TeamFG, TeamFGA, TeamFGPCT, Team3P, Team3PA, Team3PPCT, Tea...
+[34mdate[39m  (1): Date"
+"2","
+[36mℹ[39m Use `spec()` to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set `show_col_types = FALSE` to quiet this message."
+"0","# removing the 2023-2024 from logs_18_24 to avoid duplicates when binding. Final product should have the first few games of 23-24 season."
+"0",""
+"0","logs18_24 <- logs18_24 %>% "
+"0","  filter(Season != ""2023-2024"")"
+"0",""
+"0","#62,584 records over 2018-present"
+"0",""
+"0","any(duplicated(logs24))"
+"1","[1]"
+"1"," FALSE"
+"1","
+"
+"0","any(duplicated(logs18_24))"
+"1","[1]"
+"1"," FALSE"
+"1","
+"
+"0","logs24 <- distinct(logs24)"
+"0","logs18_24 <- distinct(logs18_24)"
+"0",""
+"0","logs <- bind_rows(logs24, logs18_24)"
+"0",""
