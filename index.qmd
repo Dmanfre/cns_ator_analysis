@@ -71,21 +71,26 @@ logs <- logs %>%
 dupes <- logs %>%
   get_dupes(Date, TeamFull)
 view(dupes)
+```
 
+CHECK THIS BLOCK FOR WHY THERE IS A BREAKDOWN OF A DATE COLUMN. 
+```{r, output=FALSE}
 # changing the dates in the eight dupes
 
-logs$Date <- ifelse(logs$Date == "2019-11-24" & logs$TeamFull == "Oregon Ducks" & logs$Opponent == "Oklahoma State", "2019-11-28",
-            ifelse(logs$Date == "2018-11-24" & logs$TeamFull == "American Eagles" & logs$Opponent == "Hawaii", "2019-11-23",
-                ifelse(logs$Date == "2018-11-24" & logs$TeamFull == "Hawaii Rainbow Warriors" & logs$Opponent == "American", "2018-11-23",
-                    ifelse(logs$Date == "2023-01-25" & logs$TeamFull == "Chicago State Cougars" & logs$Opponent == "St. Francis (IL)", "2023-01-24", logs$Date))))
+logs$Date <- as.Date(ifelse(logs$Date == "2019-11-24" & logs$TeamFull == "Oregon Ducks" & logs$Opponent == "Oklahoma State", "2019-11-28", as.character(logs$Date)))
 
+logs$Date <- as.Date(ifelse(logs$Date == "2018-11-24" & logs$TeamFull == "American Eagles" & logs$Opponent == "Hawaii", "2019-11-23", as.character(logs$Date)))
+
+logs$Date <- as.Date(ifelse(logs$Date == "2018-11-24" & logs$TeamFull == "Hawaii Rainbow Warriors" & logs$Opponent == "American", "2018-11-23", as.character(logs$Date)))
+
+logs$Date <- as.Date(ifelse(logs$Date == "2023-01-25" & logs$TeamFull == "Chicago State Cougars" & logs$Opponent == "St. Francis (IL)", "2023-01-24", as.character(logs$Date)))
+
+```
+
+```{r, output=FALSE}
 #checking the new dupes should be 0.
 logs %>%
   get_dupes(Date, TeamFull)
-
-
-
-
 ```
 
 `CHECK THE ISSUE WITH THE DATE COLUMN AFTER I RUN MUTATE FOR THE WINS I DON'T KNOW WHY THIS HAPPENED. NOTHING CHANGED WITH MY CODE AT ALL.`

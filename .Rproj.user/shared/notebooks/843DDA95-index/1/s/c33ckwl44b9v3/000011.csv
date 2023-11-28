@@ -1,0 +1,6 @@
+"0","#checking the new dupes should be 0.
+logs %>%
+  get_dupes(Date, TeamFull)
+"
+"2","No duplicate combinations found of: Date, TeamFull
+"
