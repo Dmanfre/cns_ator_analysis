@@ -1,0 +1,9 @@
+"0","season_ator <- ator_only %>% 
+  group_by(Season, TeamFull, Conference) %>% 
+  summarize(season_team_ator = sum(TeamAssists)/sum(TeamTurnovers),
+            season_opp_ator = sum(OpponentAssists)/sum(OpponentTurnovers),
+            total_wins = sum(winloss),
+            total_ast = sum(TeamAssists),
+            total_tov = sum(TeamTurnovers))
+"
+"2","`summarise()` has grouped output by 'Season', 'TeamFull'. You can override using the `.groups` argument."

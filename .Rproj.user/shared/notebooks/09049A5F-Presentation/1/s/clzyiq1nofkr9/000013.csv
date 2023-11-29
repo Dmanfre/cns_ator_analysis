@@ -1,0 +1,16 @@
+"0","#only power 5 ators
+p5_conf <- ator_only %>%
+  filter(Conference %in% power_5) %>% 
+  group_by(Conference) %>% 
+  summarise(count = n(), 
+            avg_winning_ator = mean(winning_ator))
+"
+"1","[1m[33mError[39m in `summarise()`:[22m
+[38;5;253m[36mℹ[38;5;253m In argument: `avg_winning_ator = mean(winning_ator)`.
+[36mℹ[38;5;253m In group 1: `Conference = ""ACC""`.[39m
+[1mCaused by error:[22m
+[33m![39m object 'winning_ator' not found
+Backtrace:
+[90m  1. [39m... %>% ...
+[90m 11. [39m[1mbase[22m::mean(winning_ator)
+"

@@ -21,7 +21,17 @@ library(rvest)
 #install.packages("ggbeeswarm")
 library(ggbeeswarm)
 library(lubridate)
+library(wehoop)
 ```
+
+```{r}
+# images for table
+
+images <- load_wbb_team_box(2023)
+
+```
+
+
 
 ```{r, output=FALSE}
 
@@ -57,7 +67,7 @@ power_5 <- c("ACC", "Big 12", "Big Ten", "Pac-12", "SEC")
 # 56 duplicates of the team and date but different stats. Many of these games have reocrds and others don't
 # We need to get rid of the ones where and assists and turnovers are NA because we cant ID an ator for them. 
 # After this, I saw 8 games were duplicates. Some of these just have the wrong datee and I can manually fix that since its so few. Then I think I would need to join the dupes dataframe back to logs_18_24 so that the duplicate dates dont mess up the overall data. 
-# Now we are working with 61,267 records
+# Now we are working with 62834 records
 
 
 ```{r, output=FALSE}
@@ -93,7 +103,6 @@ logs %>%
   get_dupes(Date, TeamFull)
 ```
 
-`CHECK THE ISSUE WITH THE DATE COLUMN AFTER I RUN MUTATE FOR THE WINS I DON'T KNOW WHY THIS HAPPENED. NOTHING CHANGED WITH MY CODE AT ALL.`
 
 mutating certain columns that I may need for the analysis. team_ator, opp_ator and point difference
 ```{r, output=FALSE}
@@ -127,8 +136,9 @@ season_ator <- ator_only %>%
   group_by(Season, TeamFull, Conference) %>% 
   summarize(season_team_ator = sum(TeamAssists)/sum(TeamTurnovers),
             season_opp_ator = sum(OpponentAssists)/sum(OpponentTurnovers),
-            total_wins = sum(winloss)
-            )
+            total_wins = sum(winloss),
+            total_ast = sum(TeamAssists),
+            total_tov = sum(TeamTurnovers))
 
 # To filter for a specific team, inster this: filter(TeamFull == "team_name")
 ```
@@ -188,7 +198,7 @@ umd_22_23_ator <- umd %>%
   filter(Season == "2022-2023") %>% 
   arrange(desc(TeamAssists))
 
-#First five games of this season
+#First seven games of this season
 umd_23_24_ator <- umd %>% 
   filter(Season == "2023-2024")
 
@@ -364,6 +374,35 @@ summary(over_2)
 
 ```
 
+```{r}
+# median big ten ator
+
+# This shows games involving ONE big tean team
+b10_games <- ator_only %>% 
+  filter(Conference == "Big Ten") %>% 
+  arrange(desc(team_ator)) %>% 
+  head(10)
+
+summary(b10_games)
+```
+`In games that invovle a big ten team, Maryland owns four of the 10 highest ratios over the last five yaers.`
+
+```{r}
+# To get big ten games, I need to create a list of the B10 teams, then filter when team and opponent are the big ten teams. 
+
+big10_teams <- c("Nebraska Cornhuskers", "Iowa Hawkeyes", "Minnesota Golden Gophers", "Illinois Fighting Illini", "Northwestern Wildcats", "Wisconsin Badgers", "Indiana Hoosiers", "Purdue Boilermakers", "Ohio State Buckeyes", "Michigan Wolverines", "Michigan State Spartans", "Penn State Nittany Lions", "Rutgers Scarlet Knights", "Maryland Terrapins")
+
+big10_opponents <- c("Nebraska", "Iowa", "Minnesota", "Illinois", "Northwestern", "Wisconsin", "Indiana", "Purdue", "Ohio State", "Michigan", "Michigan State", "Penn State", "Rutgers", "Maryland")
+
+
+# This shows Big Ten Games. 
+ b10_conf_games <- ator_only %>% 
+  filter(TeamFull %in% big10_teams & Opponent %in% big10_opponents) %>% 
+   arrange(desc(team_ator)) %>% 
+   head(15)
+
+
+```
 
 
 
@@ -372,6 +411,8 @@ Exporting data
 
 write_csv(b10, "data/b10.csv")
 write_csv(season_ator_2022_23, "data/season_ator_2022_23.csv")
+write_csv(b10_conf_games, "data/b10_conf_games.csv")
+write_csv(b10_games, "data/b10_games.csv")
 
 ```
 
